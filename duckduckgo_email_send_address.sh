@@ -10,8 +10,9 @@ print_usage ()
 	echo "[TO_ADDRESS_0] [DUCKDUCKGO_EMAIL_0]";
 	echo "[TO_ADDRESS_1] DUCKDUCKGO_EMAIL_1]";
 	echo "etc...";
+	echo "Any [TO_ADDRESS] can contain multiple comma separated [TO_ADDRESS] like this, [TO_ADDRESS_A],[TO_ADDRESS_B],[TO_ADDRESS_C]..."
 	echo
-	echo "Note that when running the script from Git Bash you need to replace ./duckduckgo_email_send_address.sh... with sh duckduckgo_email_send_address.sh"
+	echo "Note that when running the script from Git Bash you need to replace ./duckduckgo_email_send_address.sh... with sh duckduckgo_email_send_address.sh..."
 }
 
 create_send_address () { echo "$1" | sed 's/ /_/' | sed '0,/@/{s/@/_at_/}' | sed 's/$/, /'; }
@@ -40,7 +41,11 @@ if [ "${#arguments[@]}" -eq 1 ]; then
 		create_send_address "$l"
 	done <${arguments[0]}
 elif [ "${#arguments[@]}" -eq 2 ]; then
-	create_send_address "${arguments[0]} ${arguments[1]}"
+	IFS=',' read -r -a to_addresses <<< "${arguments[0]}"
+	for to_address in "${to_addresses[@]}"
+	do
+		create_send_address "${to_address} ${arguments[1]}"
+	done
 else
 	echo "To many / few arguments."
 	print_usage;
